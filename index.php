@@ -1,6 +1,6 @@
 <?php
 // Connexion à la base de données
-$pdo = new PDO('mysql:host=localhost;dbname=reppop', 'root', 'Deflagratione89');
+$pdo = new PDO('mysql:host=localhost;dbname=reppop', 'root', 'Deflagratione89!');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Récupération des informations des personnes
