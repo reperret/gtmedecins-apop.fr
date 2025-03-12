@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
+
+/* Appliquer la police Open Sans globalement */
+body {
+    font-family: 'Nunito', sans-serif;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+}
+
+/* Sur mobile, on peut réduire encore la taille */
+@media (max-width: 767px) {
+    body {
+        font-size: 12px;
+    }
+}
+
+/* Barre de navigation */
+.navbar {
+    background-color: #066b6b;
+    color: white;
+}
+
+.navbar-brand img {
+    height: 50px;
+    margin-right: 15px;
+}
+
+.navbar .btn {
+    background-color: white;
+    color: #066b6b;
+    border: none;
+    margin-left: auto;
+}
+
+/* Container large : marge latérale réduite */
+.container {
+    max-width: 98%;
+}
+
+/* Carte en pleine hauteur (index.php) */
+#map {
+    height: 90vh;
+}
+
+/* Popup d'ajout (index.php) */
+#addModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1050;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    /* Limite la hauteur pour créer un ascenseur */
+    overflow-y: auto;
+    /* Barre de défilement si le contenu déborde */
+}
+
+/* Overlay (index.php) */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    display: none;
+}
+
+/* Label en gras et couleur (#066b6b) */
+.form-group label,
+.modal-body .info-label {
+    font-weight: bold;
+    color: #066b6b;
+}
+
+/* Image dans la modale de détail */
+.modal-body img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Pour le bouton "Ajouter une photo" stylé (index.php) */
+#photoLabel {
+    display: inline-block;
+    background-color: #f0f0f0;
+    color: #444;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+#photoLabel:hover {
+    background-color: #e0e0e0;
+}
+
+#photo {
+    display: none;
+    /* on masque l'input file classique */
+}
+
+#cropImage {
+    max-width: 100%;
+    margin-top: 10px;
+    display: none;
+}
+
+#cropButton,
+#deleteCroppedButton {
+    margin-top: 10px;
+    display: none;
+}
+
+/* Table plus compact (annuaire.php) */
+.table-sm td,
+.table-sm th {
+    padding: .3rem;
+}
+
+/* Images avatar (annuaire.php) */
+.avatar-img {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Bouton gris discret (annuaire.php) */
+.btn-grey {
+    background-color: #e0e0e0;
+    color: #333;
+    border: 1px solid #ccc;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-grey:hover {
+    background-color: #d0d0d0;
+}
+
+/* Mini-calendrier (annuaire.php) */
+.mini-calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.mini-calendar th,
+.mini-calendar td {
+    border: 1px solid #ccc;
+    padding: 4px;
+    text-align: center;
+}
+
+.mini-calendar thead {
+    background-color: #f5f5f5;
+}
+
+.mini-calendar .bg-red {
+    background-color: #178C84;
+    color: #fff;
+}
+
+
+/* Styles pour les libellés des cases à cocher (jours travaillés uniquement) */
+.form-group label input[type="checkbox"]+label,
+.form-group>div>label {
+    font-weight: normal;
+    /* Pas gras */
+    color: #000;
+    /* Noir */
+    font-size: 0.9rem;
+    /* Légèrement plus petit */
+}
