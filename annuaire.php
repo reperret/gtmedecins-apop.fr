@@ -1,6 +1,6 @@
 <?php
 // Connexion à la base de données
-$pdo = new PDO('mysql:host=localhost;dbname=reppop', 'root', 'Deflagratione89');
+$pdo = new PDO('mysql:host=localhost;dbname=reppop', 'root', 'Deflagratione89!');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Récupération des personnes
@@ -98,67 +98,69 @@ function snippet($text)
             </thead>
             <tbody>
                 <?php foreach ($personnes as $p): ?>
-                <?php
+                    <?php
                     $joursCSV    = $p['jours_travailles'] ?? '';
                     $descPoste   = trim($p['description_poste'] ?? '');
                     $autres      = trim($p['autres_casquettes'] ?? '');
                     $desc        = trim($p['description'] ?? '');
                     ?>
-                <tr>
-                    <!-- Photo ronde -->
-                    <td>
-                        <?php if (!empty($p['photo'])): ?>
-                        <img src="photos/<?php echo htmlspecialchars($p['photo']); ?>" class="avatar-img" alt="avatar"
-                            onclick="showPhotoModal('photos/<?php echo htmlspecialchars($p['photo']); ?>')">
-                        <?php endif; ?>
-                    </td>
-                    <td><?php echo htmlspecialchars($p['prenom']); ?></td>
-                    <td><?php echo htmlspecialchars($p['nom']); ?></td>
-                    <td><?php echo htmlspecialchars($p['mail']); ?></td>
-                    <td><?php echo htmlspecialchars($p['tel']); ?></td>
-                    <td><?php echo htmlspecialchars($p['code_postal']); ?></td>
-                    <td><?php echo htmlspecialchars($p['ville']); ?></td>
-                    <td><?php echo htmlspecialchars($p['intitule_poste']); ?></td>
-                    <td><?php echo htmlspecialchars($p['specialite']); ?></td>
-                    <td><?php echo htmlspecialchars($p['temps_travail']); ?></td>
+                    <tr>
+                        <!-- Photo ronde -->
+                        <td>
+                            <?php
+                            $photo = !empty($p['photo']) ? htmlspecialchars($p['photo']) : 'avatar.jpg';
+                            ?>
+                            <img src="photos/<?php echo $photo; ?>" class="avatar-img" alt="avatar"
+                                onclick="showPhotoModal('photos/<?php echo $photo; ?>')">
+                        </td>
 
-                    <!-- Jours travaillés : mini bouton "Planning" -->
-                    <td>
-                        <?php if (!empty($joursCSV)): ?>
-                        <button class="btn-grey" onclick="showPlanning('<?php echo addslashes($joursCSV); ?>')">
-                            Planning
-                        </button>
-                        <?php endif; ?>
-                    </td>
+                        <td><?php echo htmlspecialchars($p['prenom']); ?></td>
+                        <td><?php echo htmlspecialchars($p['nom']); ?></td>
+                        <td><?php echo htmlspecialchars($p['mail']); ?></td>
+                        <td><?php echo htmlspecialchars($p['tel']); ?></td>
+                        <td><?php echo htmlspecialchars($p['code_postal']); ?></td>
+                        <td><?php echo htmlspecialchars($p['ville']); ?></td>
+                        <td><?php echo htmlspecialchars($p['intitule_poste']); ?></td>
+                        <td><?php echo htmlspecialchars($p['specialite']); ?></td>
+                        <td><?php echo htmlspecialchars($p['temps_travail']); ?></td>
 
-                    <!-- Description poste : snippet + "Voir +" -->
-                    <td>
-                        <?php
+                        <!-- Jours travaillés : mini bouton "Planning" -->
+                        <td>
+                            <?php if (!empty($joursCSV)): ?>
+                                <button class="btn-grey" onclick="showPlanning('<?php echo addslashes($joursCSV); ?>')">
+                                    Planning
+                                </button>
+                            <?php endif; ?>
+                        </td>
+
+                        <!-- Description poste : snippet + "Voir +" -->
+                        <td>
+                            <?php
                             echo htmlspecialchars(snippet($descPoste));
                             if (mb_strlen($descPoste) > 10) {
                                 echo ' <button class="btn-grey" onclick="showDetail(\'Description poste\', \'' . addslashes($descPoste) . '\')">Voir +</button>';
                             }
                             ?>
-                    </td>
-                    <!-- Autres casquettes : snippet + "Voir +" -->
-                    <td>
-                        <?php
+                        </td>
+                        <!-- Autres casquettes : snippet + "Voir +" -->
+                        <td>
+                            <?php
                             echo htmlspecialchars(snippet($autres));
                             if (mb_strlen($autres) > 10) {
                                 echo ' <button class="btn-grey" onclick="showDetail(\'Autres casquettes\', \'' . addslashes($autres) . '\')">Voir +</button>';
                             }
                             ?>
-                    </td>
-                    <!-- Description : snippet + "Voir +" -->
-                    <td>
-                        <?php
+                        </td>
+                        <!-- Description : snippet + "Voir +" -->
+                        <td>
+                            <?php
                             echo htmlspecialchars(snippet($desc));
                             if (mb_strlen($desc) > 10) {
                                 echo ' <button class="btn-grey" onclick="showDetail(\'Description\', \'' . addslashes($desc) . '\')">Voir +</button>';
                             }
                             ?>
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
@@ -225,129 +227,129 @@ function snippet($text)
     <script src="https://cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json"></script>
 
     <script>
-    $(document).ready(function() {
-        // Initialisation DataTables en mode responsive
-        $('#myTable').DataTable({
-            pageLength: 50,
-            lengthMenu: [
-                [10, 25, 50, 100, -1],
-                [10, 25, 50, 100, "Tout"]
-            ],
-            responsive: true,
-            language: {
-                url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json"
-            }
-        });
-    });
-
-    // Fonction pour afficher la photo en grand
-    function showPhotoModal(imgPath) {
-        $('#photoModalImg').attr('src', imgPath);
-        $('#photoModal').modal('show');
-    }
-
-    // Fonction pour afficher un texte complet (desc, etc.)
-    function showDetail(title, content) {
-        $('#detailModalLabel').text(title);
-        $('#detailModalContent').text(content);
-        $('#detailModal').modal('show');
-    }
-
-    // Afficher le planning (mini calendrier)
-    function showPlanning(csvString) {
-        // daysMap en JS pour repérer "lundi_matin" etc.
-        const daysMapJS = {
-            'lundi_matin': {
-                row: 'morning',
-                col: 'lun'
-            },
-            'lundi_aprem': {
-                row: 'afternoon',
-                col: 'lun'
-            },
-            'mardi_matin': {
-                row: 'morning',
-                col: 'mar'
-            },
-            'mardi_aprem': {
-                row: 'afternoon',
-                col: 'mar'
-            },
-            'mercredi_matin': {
-                row: 'morning',
-                col: 'mer'
-            },
-            'mercredi_aprem': {
-                row: 'afternoon',
-                col: 'mer'
-            },
-            'jeudi_matin': {
-                row: 'morning',
-                col: 'jeu'
-            },
-            'jeudi_aprem': {
-                row: 'afternoon',
-                col: 'jeu'
-            },
-            'vendredi_matin': {
-                row: 'morning',
-                col: 'ven'
-            },
-            'vendredi_aprem': {
-                row: 'afternoon',
-                col: 'ven'
-            },
-            'samedi_matin': {
-                row: 'morning',
-                col: 'sam'
-            },
-            'samedi_aprem': {
-                row: 'afternoon',
-                col: 'sam'
-            },
-            'dimanche_matin': {
-                row: 'morning',
-                col: 'dim'
-            },
-            'dimanche_aprem': {
-                row: 'afternoon',
-                col: 'dim'
-            }
-        };
-
-        let parts = csvString.split(',');
-        let calendar = {
-            morning: {
-                lun: false,
-                mar: false,
-                mer: false,
-                jeu: false,
-                ven: false,
-                sam: false,
-                dim: false
-            },
-            afternoon: {
-                lun: false,
-                mar: false,
-                mer: false,
-                jeu: false,
-                ven: false,
-                sam: false,
-                dim: false
-            }
-        };
-
-        // Remplir le calendrier
-        parts.forEach(p => {
-            if (daysMapJS[p]) {
-                let row = daysMapJS[p].row;
-                let col = daysMapJS[p].col;
-                calendar[row][col] = true;
-            }
+        $(document).ready(function() {
+            // Initialisation DataTables en mode responsive
+            $('#myTable').DataTable({
+                pageLength: 50,
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "Tout"]
+                ],
+                responsive: true,
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json"
+                }
+            });
         });
 
-        // Génère le HTML du mini-calendrier
-        let html = `
+        // Fonction pour afficher la photo en grand
+        function showPhotoModal(imgPath) {
+            $('#photoModalImg').attr('src', imgPath);
+            $('#photoModal').modal('show');
+        }
+
+        // Fonction pour afficher un texte complet (desc, etc.)
+        function showDetail(title, content) {
+            $('#detailModalLabel').text(title);
+            $('#detailModalContent').text(content);
+            $('#detailModal').modal('show');
+        }
+
+        // Afficher le planning (mini calendrier)
+        function showPlanning(csvString) {
+            // daysMap en JS pour repérer "lundi_matin" etc.
+            const daysMapJS = {
+                'lundi_matin': {
+                    row: 'morning',
+                    col: 'lun'
+                },
+                'lundi_aprem': {
+                    row: 'afternoon',
+                    col: 'lun'
+                },
+                'mardi_matin': {
+                    row: 'morning',
+                    col: 'mar'
+                },
+                'mardi_aprem': {
+                    row: 'afternoon',
+                    col: 'mar'
+                },
+                'mercredi_matin': {
+                    row: 'morning',
+                    col: 'mer'
+                },
+                'mercredi_aprem': {
+                    row: 'afternoon',
+                    col: 'mer'
+                },
+                'jeudi_matin': {
+                    row: 'morning',
+                    col: 'jeu'
+                },
+                'jeudi_aprem': {
+                    row: 'afternoon',
+                    col: 'jeu'
+                },
+                'vendredi_matin': {
+                    row: 'morning',
+                    col: 'ven'
+                },
+                'vendredi_aprem': {
+                    row: 'afternoon',
+                    col: 'ven'
+                },
+                'samedi_matin': {
+                    row: 'morning',
+                    col: 'sam'
+                },
+                'samedi_aprem': {
+                    row: 'afternoon',
+                    col: 'sam'
+                },
+                'dimanche_matin': {
+                    row: 'morning',
+                    col: 'dim'
+                },
+                'dimanche_aprem': {
+                    row: 'afternoon',
+                    col: 'dim'
+                }
+            };
+
+            let parts = csvString.split(',');
+            let calendar = {
+                morning: {
+                    lun: false,
+                    mar: false,
+                    mer: false,
+                    jeu: false,
+                    ven: false,
+                    sam: false,
+                    dim: false
+                },
+                afternoon: {
+                    lun: false,
+                    mar: false,
+                    mer: false,
+                    jeu: false,
+                    ven: false,
+                    sam: false,
+                    dim: false
+                }
+            };
+
+            // Remplir le calendrier
+            parts.forEach(p => {
+                if (daysMapJS[p]) {
+                    let row = daysMapJS[p].row;
+                    let col = daysMapJS[p].col;
+                    calendar[row][col] = true;
+                }
+            });
+
+            // Génère le HTML du mini-calendrier
+            let html = `
           <table class="mini-calendar">
             <thead>
               <tr>
@@ -386,9 +388,9 @@ function snippet($text)
           </table>
         `;
 
-        $('#planningModalContent').html(html);
-        $('#planningModal').modal('show');
-    }
+            $('#planningModalContent').html(html);
+            $('#planningModal').modal('show');
+        }
     </script>
 </body>
 

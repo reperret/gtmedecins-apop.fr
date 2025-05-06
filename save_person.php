@@ -1,6 +1,6 @@
 <?php
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=reppop', 'root', 'Deflagratione89');
+    $pdo = new PDO('mysql:host=localhost;dbname=reppop', 'root', 'Deflagratione89!');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (Exception $e) {
     die('Erreur : ' . $e->getMessage());
@@ -64,7 +64,7 @@ try {
             $parts = explode(',', $base64);
             if (count($parts) === 2) {
                 $decoded = base64_decode($parts[1]);
-                $photoName = time() . '_cropped.jpg';
+                $photoName = date('Ymd_His') . '_' . uniqid() . '.jpg';
                 $photoPath = 'photos/' . $photoName;
                 file_put_contents($photoPath, $decoded);
 
@@ -84,7 +84,8 @@ try {
                 throw new Exception("Fichier image invalide");
             }
 
-            $photoName = time() . '_' . pathinfo($photo['name'], PATHINFO_FILENAME) . '.jpg';
+            $photoName = date('Ymd_His') . '_' . uniqid() . '.jpg';
+
             $photoPath = 'photos/' . $photoName;
 
             if (move_uploaded_file($photo['tmp_name'], $photoPath)) {

@@ -226,229 +226,231 @@ $copains = $pdo->query("SELECT * FROM personnes")->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
 
     <script>
-    // Initialisation de la carte
-    var map = L.map('map').setView([46.603354, 1.888334], 6); // Centre de la France
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+        // Initialisation de la carte
+        var map = L.map('map').setView([46.603354, 1.888334], 6); // Centre de la France
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
-    // MarkerCluster Group
-    var markersCluster = L.markerClusterGroup();
+        // MarkerCluster Group
+        var markersCluster = L.markerClusterGroup();
 
-    // Mapping pour afficher les jours
-    const daysMap = {
-        'lundi_matin': 'Lundi Matin',
-        'lundi_aprem': 'Lundi Après-midi',
-        'mardi_matin': 'Mardi Matin',
-        'mardi_aprem': 'Mardi Après-midi',
-        'mercredi_matin': 'Mercredi Matin',
-        'mercredi_aprem': 'Mercredi Après-midi',
-        'jeudi_matin': 'Jeudi Matin',
-        'jeudi_aprem': 'Jeudi Après-midi',
-        'vendredi_matin': 'Vendredi Matin',
-        'vendredi_aprem': 'Vendredi Après-midi',
-        'samedi_matin': 'Samedi Matin',
-        'samedi_aprem': 'Samedi Après-midi',
-        'dimanche_matin': 'Dimanche Matin',
-        'dimanche_aprem': 'Dimanche Après-midi'
-    };
+        // Mapping pour afficher les jours
+        const daysMap = {
+            'lundi_matin': 'Lundi Matin',
+            'lundi_aprem': 'Lundi Après-midi',
+            'mardi_matin': 'Mardi Matin',
+            'mardi_aprem': 'Mardi Après-midi',
+            'mercredi_matin': 'Mercredi Matin',
+            'mercredi_aprem': 'Mercredi Après-midi',
+            'jeudi_matin': 'Jeudi Matin',
+            'jeudi_aprem': 'Jeudi Après-midi',
+            'vendredi_matin': 'Vendredi Matin',
+            'vendredi_aprem': 'Vendredi Après-midi',
+            'samedi_matin': 'Samedi Matin',
+            'samedi_aprem': 'Samedi Après-midi',
+            'dimanche_matin': 'Dimanche Matin',
+            'dimanche_aprem': 'Dimanche Après-midi'
+        };
 
-    // Données PHP => JS
-    var copains = <?php echo json_encode($copains); ?>;
+        // Données PHP => JS
+        var copains = <?php echo json_encode($copains); ?>;
 
-    copains.forEach(function(copain) {
-        // Icon perso (photo ronde)
-        var avatarIcon = L.divIcon({
-            html: `<div style="background-image: url('photos/${copain.photo}'); 
-                              background-size: cover; 
-                              width: 40px; 
-                              height: 40px; 
-                              border-radius: 50%; 
-                              border: 2px solid #066b6b;"></div>`,
-            className: '',
-            iconSize: [40, 40],
-            popupAnchor: [0, -20],
+        copains.forEach(function(copain) {
+            // Icon perso (photo ronde)
+            var avatarIcon = L.divIcon({
+                html: `<div style="background-image: url('photos/${copain.photo ? copain.photo : 'avatar.jpg'}'); 
+                  background-size: cover; 
+                  width: 40px; 
+                  height: 40px; 
+                  border-radius: 50%; 
+                  border: 2px solid #066b6b;"></div>`,
+
+                className: '',
+                iconSize: [40, 40],
+                popupAnchor: [0, -20],
+            });
+
+            // Création d'un marqueur
+            var marker = L.marker([copain.latitude, copain.longitude], {
+                icon: avatarIcon
+            });
+
+            // Au clic => modal détail
+            marker.on('click', function() {
+                $('#personName').text(copain.prenom + ' ' + copain.nom);
+                $('#personPhoto').attr('src', 'photos/' + (copain.photo ? copain.photo : 'avatar.jpg'));
+
+
+                $('#personMail').html(copain.mail ?
+                    `<span class="info-label">Mail :</span> ${copain.mail}` : '');
+                $('#personTel').html(copain.tel ? `<span class="info-label">Tel :</span> ${copain.tel}` :
+                    '');
+
+                let cpVille = '';
+                if (copain.code_postal) cpVille += copain.code_postal + ' ';
+                if (copain.ville) cpVille += copain.ville;
+                $('#personCPVille').html(cpVille ? `<span class="info-label">Ville :</span> ${cpVille}` :
+                    '');
+
+                $('#personIntitulePoste').html(copain.intitule_poste ?
+                    `<span class="info-label">Poste :</span> ${copain.intitule_poste}` : '');
+                $('#personSpecialite').html(copain.specialite ?
+                    `<span class="info-label">Spécialité :</span> ${copain.specialite}` : '');
+                $('#personTempsTravail').html(copain.temps_travail ?
+                    `<span class="info-label">Temps de travail :</span> ${copain.temps_travail}` : '');
+
+                let jt = copain.jours_travailles ? copain.jours_travailles.split(',') : [];
+                let mapped = jt.map(j => daysMap[j] || j);
+                let jtStr = mapped.join(' | ');
+                $('#personJoursTravailles').html(jtStr ?
+                    `<span class="info-label">Jours travaillés :</span> ${jtStr}` : '');
+
+                $('#personDescriptionPoste').html(copain.description_poste ?
+                    `<span class="info-label">Description poste :</span> ${copain.description_poste}` :
+                    '');
+                $('#personAutresCasquettes').html(copain.autres_casquettes ?
+                    `<span class="info-label">Autres casquettes :</span> ${copain.autres_casquettes}` :
+                    '');
+                $('#personDescription').html(copain.description ?
+                    `<span class="info-label">Description :</span> ${copain.description}` : '');
+
+                $('#personDetailModal').modal('show');
+            });
+
+            // Ajout au cluster
+            markersCluster.addLayer(marker);
         });
 
-        // Création d'un marqueur
-        var marker = L.marker([copain.latitude, copain.longitude], {
-            icon: avatarIcon
+        // Ajout du cluster sur la carte
+        map.addLayer(markersCluster);
+
+        // Gérer le bouton "M'ajouter" => afficher la popup
+        $('#addButton').on('click', function() {
+            $('#overlay').show();
+            $('#addModal').show();
+        });
+        // Clique sur overlay => on ferme le popup
+        $('#overlay').on('click', function() {
+            $('#addModal').hide();
+            $('#overlay').hide();
         });
 
-        // Au clic => modal détail
-        marker.on('click', function() {
-            $('#personName').text(copain.prenom + ' ' + copain.nom);
-            $('#personPhoto').attr('src', 'photos/' + copain.photo);
+        // Sur codePostal => on charge la liste des villes
+        $('#codePostal').on('blur', function() {
+            let cp = $(this).val().trim();
+            if (!cp) return;
 
-            $('#personMail').html(copain.mail ?
-                `<span class="info-label">Mail :</span> ${copain.mail}` : '');
-            $('#personTel').html(copain.tel ? `<span class="info-label">Tel :</span> ${copain.tel}` :
-                '');
-
-            let cpVille = '';
-            if (copain.code_postal) cpVille += copain.code_postal + ' ';
-            if (copain.ville) cpVille += copain.ville;
-            $('#personCPVille').html(cpVille ? `<span class="info-label">Ville :</span> ${cpVille}` :
-                '');
-
-            $('#personIntitulePoste').html(copain.intitule_poste ?
-                `<span class="info-label">Poste :</span> ${copain.intitule_poste}` : '');
-            $('#personSpecialite').html(copain.specialite ?
-                `<span class="info-label">Spécialité :</span> ${copain.specialite}` : '');
-            $('#personTempsTravail').html(copain.temps_travail ?
-                `<span class="info-label">Temps de travail :</span> ${copain.temps_travail}` : '');
-
-            let jt = copain.jours_travailles ? copain.jours_travailles.split(',') : [];
-            let mapped = jt.map(j => daysMap[j] || j);
-            let jtStr = mapped.join(' | ');
-            $('#personJoursTravailles').html(jtStr ?
-                `<span class="info-label">Jours travaillés :</span> ${jtStr}` : '');
-
-            $('#personDescriptionPoste').html(copain.description_poste ?
-                `<span class="info-label">Description poste :</span> ${copain.description_poste}` :
-                '');
-            $('#personAutresCasquettes').html(copain.autres_casquettes ?
-                `<span class="info-label">Autres casquettes :</span> ${copain.autres_casquettes}` :
-                '');
-            $('#personDescription').html(copain.description ?
-                `<span class="info-label">Description :</span> ${copain.description}` : '');
-
-            $('#personDetailModal').modal('show');
-        });
-
-        // Ajout au cluster
-        markersCluster.addLayer(marker);
-    });
-
-    // Ajout du cluster sur la carte
-    map.addLayer(markersCluster);
-
-    // Gérer le bouton "M'ajouter" => afficher la popup
-    $('#addButton').on('click', function() {
-        $('#overlay').show();
-        $('#addModal').show();
-    });
-    // Clique sur overlay => on ferme le popup
-    $('#overlay').on('click', function() {
-        $('#addModal').hide();
-        $('#overlay').hide();
-    });
-
-    // Sur codePostal => on charge la liste des villes
-    $('#codePostal').on('blur', function() {
-        let cp = $(this).val().trim();
-        if (!cp) return;
-
-        $.getJSON(
-            `https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=nom,centre&format=json`,
-            function(data) {
-                $('#citySelect').empty();
-                if (!data || data.length === 0) {
-                    $('#citySelect').append(`<option value="">Aucune commune trouvée</option>`);
-                    $('#latitude').val('');
-                    $('#longitude').val('');
-                } else {
-                    data.forEach(function(commune) {
-                        let lon = commune.centre.coordinates[0];
-                        let lat = commune.centre.coordinates[1];
-                        $('#citySelect').append(`
+            $.getJSON(
+                `https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=nom,centre&format=json`,
+                function(data) {
+                    $('#citySelect').empty();
+                    if (!data || data.length === 0) {
+                        $('#citySelect').append(`<option value="">Aucune commune trouvée</option>`);
+                        $('#latitude').val('');
+                        $('#longitude').val('');
+                    } else {
+                        data.forEach(function(commune) {
+                            let lon = commune.centre.coordinates[0];
+                            let lat = commune.centre.coordinates[1];
+                            $('#citySelect').append(`
                             <option value="${commune.nom}" data-lat="${lat}" data-lon="${lon}">
                                 ${commune.nom}
                             </option>
                         `);
-                    });
-                    // Sélection auto de la première
-                    $('#citySelect').trigger('change');
+                        });
+                        // Sélection auto de la première
+                        $('#citySelect').trigger('change');
+                    }
                 }
+            );
+        });
+
+        // Sur changement de ville => maj lat/long
+        $('#citySelect').on('change', function() {
+            let optionSelected = $(this).find('option:selected');
+            if (!optionSelected.val()) {
+                $('#latitude').val('');
+                $('#longitude').val('');
+                return;
             }
-        );
-    });
+            $('#latitude').val(optionSelected.data('lat'));
+            $('#longitude').val(optionSelected.data('lon'));
+        });
 
-    // Sur changement de ville => maj lat/long
-    $('#citySelect').on('change', function() {
-        let optionSelected = $(this).find('option:selected');
-        if (!optionSelected.val()) {
-            $('#latitude').val('');
-            $('#longitude').val('');
-            return;
-        }
-        $('#latitude').val(optionSelected.data('lat'));
-        $('#longitude').val(optionSelected.data('lon'));
-    });
+        // Gestion du crop (Cropper.js)
+        let cropper;
+        let photoInput = document.getElementById('photo');
+        let cropImage = document.getElementById('cropImage');
+        let cropButton = document.getElementById('cropButton');
+        let deleteButton = document.getElementById('deleteCroppedButton');
+        let croppedImageInput = document.getElementById('croppedImage');
 
-    // Gestion du crop (Cropper.js)
-    let cropper;
-    let photoInput = document.getElementById('photo');
-    let cropImage = document.getElementById('cropImage');
-    let cropButton = document.getElementById('cropButton');
-    let deleteButton = document.getElementById('deleteCroppedButton');
-    let croppedImageInput = document.getElementById('croppedImage');
-
-    function resetPhotoState() {
-        photoInput.value = '';
-        cropImage.src = '';
-        cropImage.style.display = 'none';
-        cropButton.style.display = 'none';
-        deleteButton.style.display = 'none';
-        croppedImageInput.value = '';
-        if (cropper) {
-            cropper.destroy();
-            cropper = null;
-        }
-    }
-    resetPhotoState();
-
-    // Au choix de fichier => init cropper
-    photoInput.addEventListener('change', function(e) {
-        const files = e.target.files;
-        if (files && files.length > 0) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                cropImage.src = evt.target.result;
-                cropImage.style.display = 'block';
-                cropButton.style.display = 'inline-block';
-
-                if (cropper) cropper.destroy();
-                cropper = new Cropper(cropImage, {
-                    aspectRatio: 1,
-                    viewMode: 1
-                });
-            };
-            reader.readAsDataURL(files[0]);
-        }
-    });
-
-    // Bouton "Recadrer"
-    cropButton.addEventListener('click', function() {
-        if (cropper) {
-            let canvas = cropper.getCroppedCanvas({
-                width: 600,
-                height: 600
-            });
-            let base64data = canvas.toDataURL('image/jpeg', 0.9);
-
-            croppedImageInput.value = base64data;
-            cropImage.src = base64data;
-            cropper.destroy();
-            cropper = null;
-
+        function resetPhotoState() {
+            photoInput.value = '';
+            cropImage.src = '';
+            cropImage.style.display = 'none';
             cropButton.style.display = 'none';
-            deleteButton.style.display = 'inline-block';
+            deleteButton.style.display = 'none';
+            croppedImageInput.value = '';
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
         }
-    });
-
-    // Bouton "Supprimer"
-    deleteButton.addEventListener('click', function() {
         resetPhotoState();
-    });
 
-    // Ouvrir la popup si ?action=add
-    <?php if (isset($_GET['action']) && $_GET['action'] === 'add'): ?>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('overlay').style.display = 'block';
-        document.getElementById('addModal').style.display = 'block';
-    });
-    <?php endif; ?>
+        // Au choix de fichier => init cropper
+        photoInput.addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    cropImage.src = evt.target.result;
+                    cropImage.style.display = 'block';
+                    cropButton.style.display = 'inline-block';
+
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(cropImage, {
+                        aspectRatio: 1,
+                        viewMode: 1
+                    });
+                };
+                reader.readAsDataURL(files[0]);
+            }
+        });
+
+        // Bouton "Recadrer"
+        cropButton.addEventListener('click', function() {
+            if (cropper) {
+                let canvas = cropper.getCroppedCanvas({
+                    width: 600,
+                    height: 600
+                });
+                let base64data = canvas.toDataURL('image/jpeg', 0.9);
+
+                croppedImageInput.value = base64data;
+                cropImage.src = base64data;
+                cropper.destroy();
+                cropper = null;
+
+                cropButton.style.display = 'none';
+                deleteButton.style.display = 'inline-block';
+            }
+        });
+
+        // Bouton "Supprimer"
+        deleteButton.addEventListener('click', function() {
+            resetPhotoState();
+        });
+
+        // Ouvrir la popup si ?action=add
+        <?php if (isset($_GET['action']) && $_GET['action'] === 'add'): ?>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('overlay').style.display = 'block';
+                document.getElementById('addModal').style.display = 'block';
+            });
+        <?php endif; ?>
     </script>
 </body>
 
